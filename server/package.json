@@ -1,0 +1,38 @@
+{
+  "name": "connectx-server",
+  "version": "1.0.0",
+  "description": "ConnectX Dating App Backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "db:init": "node -e \"require('./config/db').initDB()\"",
+    "test": "NODE_ENV=test jest --runInBand --forceExit --detectOpenHandles",
+    "test:auth": "NODE_ENV=test jest --runInBand --forceExit tests/auth.test.js",
+    "test:user": "NODE_ENV=test jest --runInBand --forceExit tests/user.test.js",
+    "test:discover": "NODE_ENV=test jest --runInBand --forceExit tests/discover.test.js",
+    "test:chat": "NODE_ENV=test jest --runInBand --forceExit tests/chat.test.js",
+    "test:admin": "NODE_ENV=test jest --runInBand --forceExit tests/admin.test.js",
+    "test:db": "NODE_ENV=test jest --runInBand --forceExit tests/database.test.js",
+    "test:coverage": "NODE_ENV=test jest --runInBand --coverage --forceExit"
+  },
+  "dependencies": {
+    "axios": "^1.20.0",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "expo-server-sdk": "^7.2.0",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.11.0",
+    "socket.io": "^4.7.5",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "jest": "^30.5.0",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.2.2"
+  }
+}

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConnectX — Privacy Policy</title>
+<style>
+  :root{
+    --bg:#12131a;
+    --panel:#181a24;
+    --ink:#eae7e0;
+    --ink-dim:#9a9aa8;
+    --rule:#2a2c3a;
+    --accent:#e8536b;
+    --accent-dim:#5c2a34;
+    --serif: "Iowan Old Style","Georgia","Times New Roman",serif;
+    --sans: -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--serif);
+    line-height:1.65;
+  }
+
+  /* ---------- Header / Hero ---------- */
+  .hero{
+    padding:76px 24px 56px;
+    border-bottom:1px solid var(--rule);
+    background:
+      radial-gradient(600px 300px at 12% -10%, rgba(232,83,107,.16), transparent 60%),
+      var(--bg);
+  }
+  .hero-inner{max-width:880px;margin:0 auto;}
+  .wordmark{
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:.02em;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin-bottom:38px;
+  }
+  .wordmark .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-dim);
+  }
+  h1.title{
+    font-size:clamp(34px,5.4vw,54px);
+    margin:0 0 14px;
+    font-weight:500;
+    letter-spacing:-.01em;
+    color:#fff;
+  }
+  .hero-sub{
+    font-family:var(--sans);
+    font-size:15px;
+    color:var(--ink-dim);
+    max-width:60ch;
+    margin:0 0 22px;
+  }
+  .meta-row{
+    font-family:var(--sans);
+    font-size:13px;
+    color:var(--ink-dim);
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 22px;
+  }
+  .meta-row span b{color:var(--ink);font-weight:600;}
+
+  /* ---------- Layout ---------- */
+  .layout{
+    max-width:1180px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:270px 1fr;
+    gap:56px;
+    padding:48px 24px 120px;
+    align-items:start;
+  }
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    nav.toc{position:static;order:2;}
+    .content{order:1;}
+  }
+
+  nav.toc{
+    position:sticky;
+    top:32px;
+    font-family:var(--sans);
+    font-size:13px;
+    max-height:calc(100vh - 64px);
+    overflow-y:auto;
+    padding-right:8px;
+  }
+  nav.toc .toc-label{
+    text-transform:uppercase;
+    font-size:11px;
+    letter-spacing:.08em;
+    color:var(--ink-dim);
+    margin-bottom:14px;
+  }
+  nav.toc ol{
+    list-style:none;
+    margin:0;padding:0;
+    counter-reset:sec;
+    border-left:1px solid var(--rule);
+  }
+  nav.toc li{counter-increment:sec;}
+  nav.toc a{
+    display:block;
+    padding:6px 0 6px 16px;
+    margin-left:-1px;
+    border-left:1px solid transparent;
+    color:var(--ink-dim);
+    text-decoration:none;
+    line-height:1.4;
+    transition:color .15s, border-color .15s;
+  }
+  nav.toc a:hover{color:var(--ink);}
+  nav.toc a::before{
+    content:counter(sec) "  ";
+    color:#5c5d6d;
+  }
+  nav.toc a.active{
+    color:var(--accent);
+    border-left-color:var(--accent);
+  }
+
+  /* ---------- Content ---------- */
+  .content{min-width:0;}
+  section.clause{
+    padding:30px 0;
+    border-bottom:1px solid var(--rule);
+    scroll-margin-top:28px;
+  }
+  section.clause:last-child{border-bottom:none;}
+  .clause h2{
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:12px;
+    letter-spacing:.06em;
+    color:var(--accent);
+    margin:0 0 6px;
+  }
+  .clause h2 .num{
+    color:#5c5d6d;
+    font-weight:600;
+    margin-right:8px;
+  }
+  .clause h3.headline{
+    font-size:22px;
+    font-weight:500;
+    color:#fff;
+    margin:2px 0 16px;
+    letter-spacing:-.005em;
+  }
+  .clause p{margin:0 0 14px;color:#d7d4cd;}
+  .clause p:last-child{margin-bottom:0;}
+  .clause ul{margin:0 0 14px;padding-left:22px;color:#d7d4cd;}
+  .clause ul li{margin-bottom:6px;}
+  .clause ul:last-child{margin-bottom:0;}
+  h4.sub{
+    font-family:var(--sans);
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    margin:20px 0 8px;
+  }
+  h4.sub:first-of-type{margin-top:0;}
+
+  .callout{
+    font-family:var(--sans);
+    font-size:13px;
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-left:3px solid var(--accent);
+    padding:14px 16px;
+    border-radius:4px;
+    color:var(--ink-dim);
+    margin-top:16px;
+  }
+
+  .contact-card{
+    font-family:var(--sans);
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:10px;
+    padding:22px 24px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px 32px;
+    font-size:13.5px;
+  }
+  @media (max-width:520px){.contact-card{grid-template-columns:1fr;}}
+  .contact-card div b{
+    display:block;
+    color:var(--ink-dim);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-bottom:4px;
+    font-weight:700;
+  }
+  .contact-card div span{color:var(--ink);}
+
+  footer{
+    font-family:var(--sans);
+    font-size:12px;
+    color:var(--ink-dim);
+    text-align:center;
+    padding:36px 24px 48px;
+    border-top:1px solid var(--rule);
+  }
+  footer .heart{color:var(--accent);}
+
+  ::selection{background:var(--accent-dim);color:#fff;}
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:#2e3040;border-radius:4px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="wordmark"><span class="dot"></span>ConnectX</div>
+    <h1 class="title">Privacy Policy</h1>
+    <p class="hero-sub">This policy explains how ConnectX collects, uses, stores, shares, protects, and otherwise processes personal information when you use our application, website, services, and related features.</p>
+    <div class="meta-row">
+      <span>Effective Date: <b>30 August 2026</b></span>
+      <span>Last Updated: <b>30 August 2026</b></span>
+      <span>App: <b>ConnectX Dating App</b></span>
+      <span>Region: <b>India</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <nav class="toc" aria-label="Table of contents">
+    <div class="toc-label">On this page</div>
+    <ol id="toc-list">
+      <li><a href="#s1">Introduction</a></li>
+      <li><a href="#s2">Information We Collect</a></li>
+      <li><a href="#s3">How We Use Your Information</a></li>
+      <li><a href="#s4">Legal Basis for Processing</a></li>
+      <li><a href="#s5">Consent</a></li>
+      <li><a href="#s6">Public &amp; Discoverable Profile Info</a></li>
+      <li><a href="#s7">Information About Other People</a></li>
+      <li><a href="#s8">Cookies &amp; Similar Technologies</a></li>
+      <li><a href="#s9">Analytics</a></li>
+      <li><a href="#s10">Advertising</a></li>
+      <li><a href="#s11">Payments &amp; Subscriptions</a></li>
+      <li><a href="#s12">How We Share Information</a></li>
+      <li><a href="#s13">We Do Not Sell Personal Information</a></li>
+      <li><a href="#s14">Data Security</a></li>
+      <li><a href="#s15">Data Retention</a></li>
+      <li><a href="#s16">Account Deletion</a></li>
+      <li><a href="#s17">Your Privacy Rights</a></li>
+      <li><a href="#s18">Children and Minors</a></li>
+      <li><a href="#s19">Sensitive or High-Risk Information</a></li>
+      <li><a href="#s20">Location Privacy</a></li>
+      <li><a href="#s21">Verification &amp; Biometric Info</a></li>
+      <li><a href="#s22">Third-Party Links &amp; Services</a></li>
+      <li><a href="#s23">International Data Transfers</a></li>
+      <li><a href="#s24">Notifications and Marketing</a></li>
+      <li><a href="#s25">User Reports &amp; Safety Investigations</a></li>
+      <li><a href="#s26">Automated Systems &amp; Recommendations</a></li>
+      <li><a href="#s27">Data Breach &amp; Security Incidents</a></li>
+      <li><a href="#s28">Changes to This Privacy Policy</a></li>
+      <li><a href="#s29">Grievance Officer and Contact</a></li>
+      <li><a href="#s30">Governing Law</a></li>
+      <li><a href="#s31">Contact Us</a></li>
+    </ol>
+  </nav>
+
+  <main class="content">
+
+    <section class="clause" id="s1">
+      <h2><span class="num">01</span>INTRODUCTION</h2>
+      <h3 class="headline">Welcome to ConnectX</h3>
+      <p>ConnectX (“ConnectX”, “we”, “us”, or “our”) is a dating and social-discovery application that allows users to create profiles, discover other users, communicate, match with other users, and use related social and dating features.</p>
+      <p>This Privacy Policy explains how ConnectX collects, uses, stores, shares, protects, and otherwise processes personal information when you use our application, website, services, and related features.</p>
+      <p>By using ConnectX, you acknowledge that you have read and understood this Privacy Policy.</p>
+    </section>
+
+    <section class="clause" id="s2">
+      <h2><span class="num">02</span>INFORMATION WE COLLECT</h2>
+      <h3 class="headline">Depending on the features you use</h3>
+
+      <h4 class="sub">A. Account Information</h4>
+      <ul>
+        <li>Name or display name</li>
+        <li>Date of birth</li>
+        <li>Age</li>
+        <li>Gender</li>
+        <li>Mobile number</li>
+        <li>Email address</li>
+        <li>Login credentials or authentication information</li>
+        <li>Profile photograph</li>
+        <li>Account ID</li>
+      </ul>
+
+      <h4 class="sub">B. Profile Information</h4>
+      <p>You may voluntarily provide:</p>
+      <ul>
+        <li>Profile photographs</li>
+        <li>Bio/about-me information</li>
+        <li>Hobbies</li>
+        <li>Interests</li>
+        <li>Education information</li>
+        <li>Occupation</li>
+        <li>Relationship preferences</li>
+        <li>Dating preferences</li>
+        <li>Languages</li>
+        <li>Lifestyle preferences</li>
+        <li>Other information you choose to add to your profile</li>
+      </ul>
+      <div class="callout">Information placed on a public or discoverable profile may be visible to other ConnectX users.</div>
+
+      <h4 class="sub">C. Verification Information</h4>
+      <p>Where ConnectX provides verification features, we may collect information required to verify age, identity, profile authenticity, photograph authenticity, and gender, where applicable to the verification feature.</p>
+      <p>If verification requires documents, photographs, video, audio, facial comparison, or other information, we will use such information for the stated verification, safety, security, fraud-prevention, and legal-compliance purposes.</p>
+      <p>ConnectX will not claim that verification guarantees that another user is safe, genuine, or trustworthy.</p>
+
+      <h4 class="sub">D. Location Information</h4>
+      <p>With appropriate permission, ConnectX may collect approximate location, device location, city or region, and location-related information used for matching and discovery. ConnectX may use approximate location rather than displaying your exact location to other users. You may control location permissions through your device settings.</p>
+
+      <h4 class="sub">E. Communication Information</h4>
+      <p>If you use ConnectX messaging or communication features, we may process information relating to those communications for purposes such as providing messaging functionality, preventing spam, detecting fraud, investigating abuse, protecting users, enforcing our Terms, and complying with applicable law.</p>
+
+      <h4 class="sub">F. Device and Technical Information</h4>
+      <p>We may automatically collect IP address, device type, operating system, app version, device identifiers, browser information, language settings, network information, crash reports, log information, and usage information.</p>
+
+      <h4 class="sub">G. Usage Information</h4>
+      <p>We may collect information about how you use ConnectX, including features used, profiles viewed, matches, likes and interactions, search preferences, app activity, login and logout information, technical events, and performance information.</p>
+    </section>
+
+    <section class="clause" id="s3">
+      <h2><span class="num">03</span>HOW WE USE YOUR INFORMATION</h2>
+      <h3 class="headline">ConnectX may use personal information to</h3>
+      <ul>
+        <li>Create and manage your account.</li>
+        <li>Provide dating and social-discovery services.</li>
+        <li>Create and display your profile.</li>
+        <li>Provide matching and recommendation features.</li>
+        <li>Enable communication between users.</li>
+        <li>Provide age and identity verification.</li>
+        <li>Detect fake accounts and fraudulent activity.</li>
+        <li>Prevent spam, abuse, harassment, and scams.</li>
+        <li>Protect users and platform security.</li>
+        <li>Process payments and subscriptions.</li>
+        <li>Provide customer support.</li>
+        <li>Respond to complaints and reports.</li>
+        <li>Improve application performance.</li>
+        <li>Develop and improve ConnectX features.</li>
+        <li>Conduct analytics and operational measurement.</li>
+        <li>Send service-related notifications.</li>
+        <li>Send promotional communications where legally permitted and according to your preferences.</li>
+        <li>Comply with legal obligations and lawful requests.</li>
+        <li>Protect the rights, property, and safety of ConnectX, its users, and others.</li>
+        <li>Investigate suspected violations of our Terms and policies.</li>
+      </ul>
+    </section>
+
+    <section class="clause" id="s4">
+      <h2><span class="num">04</span>LEGAL BASIS FOR PROCESSING</h2>
+      <p>Where applicable, ConnectX will process personal information based on appropriate legal grounds, including:</p>
+      <ul>
+        <li>Your consent.</li>
+        <li>Provision of services requested by you.</li>
+        <li>Compliance with legal obligations.</li>
+        <li>Legitimate operational, security, fraud-prevention, or safety purposes where permitted by applicable law.</li>
+        <li>Other lawful grounds available under applicable law.</li>
+      </ul>
+      <p>Where consent is required, we will provide an appropriate consent mechanism.</p>
+    </section>
+
+    <section class="clause" id="s5">
+      <h2><span class="num">05</span>CONSENT</h2>
+      <p>Where ConnectX relies on consent, you may be asked to provide consent before certain personal information is collected or used.</p>
+      <p>You may withdraw consent where legally permitted. Withdrawal of consent may affect your ability to use certain features or services that require the relevant information. Withdrawal of consent will not necessarily affect processing already lawfully carried out before withdrawal.</p>
+    </section>
+
+    <section class="clause" id="s6">
+      <h2><span class="num">06</span>PUBLIC AND DISCOVERABLE PROFILE INFORMATION</h2>
+      <p>Certain information may be visible to other ConnectX users, depending on your profile and privacy settings. This may include:</p>
+      <ul>
+        <li>Display name</li>
+        <li>Age</li>
+        <li>Profile photographs</li>
+        <li>Bio</li>
+        <li>Interests</li>
+        <li>Hobbies</li>
+        <li>General location</li>
+        <li>Other profile information you choose to publish</li>
+      </ul>
+      <div class="callout">Do not publish information that you do not want other users to see.</div>
+    </section>
+
+    <section class="clause" id="s7">
+      <h2><span class="num">07</span>INFORMATION ABOUT OTHER PEOPLE</h2>
+      <p>You must not provide ConnectX with another person's personal information unless you have a lawful basis or appropriate permission to do so.</p>
+      <p>You must not upload another person's private photographs, documents, contact information, or personal data without authorization.</p>
+    </section>
+
+    <section class="clause" id="s8">
+      <h2><span class="num">08</span>COOKIES AND SIMILAR TECHNOLOGIES</h2>
+      <p>ConnectX may use cookies, SDKs, pixels, local storage, analytics technologies, or similar technologies on its website or application. These technologies may be used for:</p>
+      <ul>
+        <li>Authentication</li>
+        <li>Security</li>
+        <li>Remembering preferences</li>
+        <li>Analytics</li>
+        <li>Performance monitoring</li>
+        <li>Fraud prevention</li>
+        <li>Improving user experience</li>
+        <li>Advertising, where applicable</li>
+      </ul>
+      <p>You may be able to control certain technologies through device, browser, or app settings.</p>
+    </section>
+
+    <section class="clause" id="s9">
+      <h2><span class="num">09</span>ANALYTICS</h2>
+      <p>We may use analytics services to understand how users interact with ConnectX and to improve our services. Analytics information may include technical, device, usage, and performance information.</p>
+      <p>Where third-party analytics providers process information on our behalf, we may require appropriate contractual and security safeguards.</p>
+    </section>
+
+    <section class="clause" id="s10">
+      <h2><span class="num">10</span>ADVERTISING</h2>
+      <p>ConnectX may display advertisements or provide promotional content. Where advertising partners are used, information may be processed according to applicable law and the relevant advertising provider's policies.</p>
+      <p>We will not represent that third-party advertising services are operated by ConnectX unless they are.</p>
+    </section>
+
+    <section class="clause" id="s11">
+      <h2><span class="num">11</span>PAYMENTS AND SUBSCRIPTIONS</h2>
+      <p>ConnectX may provide paid subscriptions, premium features, boosts, virtual items, or other paid services. Payment information may be processed by third-party payment processors, app stores, or other payment providers.</p>
+      <p>ConnectX may receive information such as:</p>
+      <ul>
+        <li>Transaction ID</li>
+        <li>Payment status</li>
+        <li>Subscription status</li>
+        <li>Purchase information</li>
+        <li>Product purchased</li>
+        <li>Payment-related metadata</li>
+      </ul>
+      <p>Unless expressly stated otherwise, ConnectX does not need to receive or store your complete card number or payment PIN when payment is processed by an authorized payment provider.</p>
+    </section>
+
+    <section class="clause" id="s12">
+      <h2><span class="num">12</span>HOW WE SHARE INFORMATION</h2>
+      <p>ConnectX may share information with the following categories of recipients where appropriate and legally permitted:</p>
+
+      <h4 class="sub">A. Other Users</h4>
+      <p>Information you voluntarily make visible on your ConnectX profile may be shown to other users.</p>
+
+      <h4 class="sub">B. Service Providers</h4>
+      <p>We may use third-party service providers for cloud hosting, database services, analytics, customer support, identity verification, fraud detection, security, notifications, payment processing, email/SMS services, and technical infrastructure. These providers may process information on our behalf for specified purposes.</p>
+
+      <h4 class="sub">C. Legal Authorities</h4>
+      <p>We may disclose information where required or permitted by applicable law, court order, lawful governmental request, or other legal process.</p>
+
+      <h4 class="sub">D. Safety and Fraud Prevention</h4>
+      <p>We may share appropriate information when reasonably necessary to investigate fraud, abuse, threats, security incidents, or illegal activity, subject to applicable law.</p>
+
+      <h4 class="sub">E. Business Transfers</h4>
+      <p>If ConnectX is involved in a merger, acquisition, restructuring, financing, sale of assets, or similar transaction, personal information may be transferred as part of that transaction, subject to applicable legal requirements.</p>
+    </section>
+
+    <section class="clause" id="s13">
+      <h2><span class="num">13</span>WE DO NOT SELL PERSONAL INFORMATION</h2>
+      <p>ConnectX does not sell your personal information as a standalone commercial product.</p>
+      <p>If our business model changes, we will update this Privacy Policy and provide any notices or choices required by applicable law.</p>
+    </section>
+
+    <section class="clause" id="s14">
+      <h2><span class="num">14</span>DATA SECURITY</h2>
+      <p>We use reasonable technical and organizational safeguards designed to protect personal information from unauthorized access, loss, misuse, alteration, disclosure, or destruction. Security measures may include:</p>
+      <ul>
+        <li>Access controls</li>
+        <li>Encryption where appropriate</li>
+        <li>Authentication controls</li>
+        <li>Monitoring</li>
+        <li>Secure infrastructure</li>
+        <li>Logging</li>
+        <li>Security testing</li>
+        <li>Internal policies</li>
+      </ul>
+      <p>However, no Internet-based service can guarantee absolute security. You are also responsible for protecting your password, OTP, device, and account credentials.</p>
+    </section>
+
+    <section class="clause" id="s15">
+      <h2><span class="num">15</span>DATA RETENTION</h2>
+      <p>We retain personal information only for as long as reasonably necessary for the purposes described in this Privacy Policy, unless a longer retention period is required or permitted by law. Retention periods may depend on:</p>
+      <ul>
+        <li>Whether your account remains active.</li>
+        <li>The purpose for which information was collected.</li>
+        <li>Legal obligations.</li>
+        <li>Fraud and safety requirements.</li>
+        <li>Dispute resolution.</li>
+        <li>Security requirements.</li>
+        <li>Financial and transaction records.</li>
+      </ul>
+    </section>
+
+    <section class="clause" id="s16">
+      <h2><span class="num">16</span>ACCOUNT DELETION</h2>
+      <p>You may request deletion of your ConnectX account through the available account settings or by contacting ConnectX Support.</p>
+      <p>When your account is deleted, we will take reasonable steps to delete or anonymize personal information that we are no longer required or permitted to retain.</p>
+      <p>Certain information may be retained where required or permitted by law, including information necessary for legal compliance, fraud prevention, security, dispute resolution, financial records, and enforcement of agreements.</p>
+    </section>
+
+    <section class="clause" id="s17">
+      <h2><span class="num">17</span>YOUR PRIVACY RIGHTS</h2>
+      <p>Subject to applicable law, you may have rights regarding your personal information, including rights to:</p>
+      <ul>
+        <li>Access information about processing.</li>
+        <li>Request correction of inaccurate information.</li>
+        <li>Request deletion of personal information.</li>
+        <li>Withdraw consent where applicable.</li>
+        <li>Raise a grievance.</li>
+        <li>Exercise other rights available under applicable law.</li>
+      </ul>
+      <p>Requests may be subject to verification to protect your account and personal information.</p>
+    </section>
+
+    <section class="clause" id="s18">
+      <h2><span class="num">18</span>CHILDREN AND MINORS</h2>
+      <p>ConnectX is strictly intended for users aged 18 years and above. We do not knowingly permit persons under 18 to create or use ConnectX accounts.</p>
+      <p>If we become aware that a person under 18 has created an account, we may suspend and delete that account and take appropriate steps consistent with applicable law.</p>
+      <div class="callout">If you believe a minor is using ConnectX, please report the account immediately.</div>
+    </section>
+
+    <section class="clause" id="s19">
+      <h2><span class="num">19</span>SENSITIVE OR HIGH-RISK INFORMATION</h2>
+      <p>Users should avoid voluntarily posting highly sensitive information on their profiles or in conversations, including:</p>
+      <ul>
+        <li>Passwords</li>
+        <li>OTPs</li>
+        <li>Bank account information</li>
+        <li>UPI PIN</li>
+        <li>Credit/debit card details</li>
+        <li>Government identification numbers</li>
+        <li>Private medical information</li>
+        <li>Private documents</li>
+      </ul>
+      <p>ConnectX will handle information according to applicable law and the purposes described in this Privacy Policy.</p>
+    </section>
+
+    <section class="clause" id="s20">
+      <h2><span class="num">20</span>LOCATION PRIVACY</h2>
+      <p>ConnectX may use location information to improve matching and discovery. We may not disclose your precise location to other users unless a feature specifically allows it and appropriate permissions and controls are provided.</p>
+      <p>You can disable location access through your device settings, although some ConnectX features may become unavailable.</p>
+    </section>
+
+    <section class="clause" id="s21">
+      <h2><span class="num">21</span>VERIFICATION AND BIOMETRIC/FACIAL INFORMATION</h2>
+      <p>If ConnectX introduces identity or facial verification, additional information may be processed for verification and safety purposes.</p>
+      <p>Where applicable, ConnectX will provide appropriate notice and obtain required permissions or consent. Verification data will be handled according to applicable law and the specific verification provider's terms, where applicable.</p>
+    </section>
+
+    <section class="clause" id="s22">
+      <h2><span class="num">22</span>THIRD-PARTY LINKS AND SERVICES</h2>
+      <p>ConnectX may contain links or integrations to third-party websites or services. Once you leave ConnectX and use a third-party service, that service's own privacy policy may apply.</p>
+      <p>ConnectX is not responsible for the independent privacy practices of third-party services.</p>
+    </section>
+
+    <section class="clause" id="s23">
+      <h2><span class="num">23</span>INTERNATIONAL DATA TRANSFERS</h2>
+      <p>Some service providers or technical infrastructure may be located outside India. Where personal information is transferred or processed outside India, ConnectX will comply with applicable legal requirements and implement appropriate safeguards where required.</p>
+    </section>
+
+    <section class="clause" id="s24">
+      <h2><span class="num">24</span>NOTIFICATIONS AND MARKETING</h2>
+      <p>ConnectX may send:</p>
+      <ul>
+        <li>Account notifications</li>
+        <li>Security alerts</li>
+        <li>Verification messages</li>
+        <li>Match notifications</li>
+        <li>Message notifications</li>
+        <li>Service announcements</li>
+        <li>Promotional communications</li>
+      </ul>
+      <p>You may be able to control promotional communications through the app settings or available unsubscribe mechanisms. Certain essential service and security notifications may continue even if you opt out of promotional communications.</p>
+    </section>
+
+    <section class="clause" id="s25">
+      <h2><span class="num">25</span>USER REPORTS AND SAFETY INVESTIGATIONS</h2>
+      <p>When you report another user, ConnectX may process:</p>
+      <ul>
+        <li>Your report</li>
+        <li>The reported user's account information</li>
+        <li>Relevant profile information</li>
+        <li>Relevant communication or activity information</li>
+        <li>Supporting evidence provided by you</li>
+      </ul>
+      <p>This information may be used to investigate and respond to safety, abuse, fraud, or policy violations.</p>
+    </section>
+
+    <section class="clause" id="s26">
+      <h2><span class="num">26</span>AUTOMATED SYSTEMS AND RECOMMENDATIONS</h2>
+      <p>ConnectX may use automated systems, algorithms, or machine-learning technologies to:</p>
+      <ul>
+        <li>Recommend profiles</li>
+        <li>Improve matching</li>
+        <li>Detect spam</li>
+        <li>Detect fraudulent activity</li>
+        <li>Identify potentially harmful behaviour</li>
+        <li>Improve platform safety</li>
+        <li>Personalize features</li>
+      </ul>
+      <p>Automated systems may produce inaccurate results. Where applicable, ConnectX may conduct additional review or take corrective action.</p>
+    </section>
+
+    <section class="clause" id="s27">
+      <h2><span class="num">27</span>DATA BREACH AND SECURITY INCIDENTS</h2>
+      <p>If ConnectX experiences a personal-data breach or security incident, we will take reasonable steps to investigate, contain, mitigate, and respond to the incident and provide notifications where required by applicable law.</p>
+    </section>
+
+    <section class="clause" id="s28">
+      <h2><span class="num">28</span>CHANGES TO THIS PRIVACY POLICY</h2>
+      <p>We may update this Privacy Policy from time to time. If we make material changes, we may notify users through the application, website, email, or another appropriate method. The updated version will include a revised "Last Updated" date.</p>
+    </section>
+
+    <section class="clause" id="s29">
+      <h2><span class="num">29</span>GRIEVANCE OFFICER AND CONTACT</h2>
+      <p>For privacy questions, complaints, requests, or grievances, please contact us using the details below. We will process grievances in accordance with applicable law and our applicable grievance procedures.</p>
+      <div class="contact-card">
+        <div><b>ConnectX Privacy Support</b><span>[INSERT EMAIL]</span></div>
+        <div><b>Grievance Officer</b><span>[INSERT NAME]</span></div>
+        <div><b>Grievance Email</b><span>[INSERT EMAIL]</span></div>
+        <div><b>Registered Office</b><span>[INSERT FULL ADDRESS]</span></div>
+        <div><b>Official Website</b><span>[INSERT WEBSITE]</span></div>
+        <div><b>Support</b><span>[INSERT SUPPORT URL/IN-APP SUPPORT]</span></div>
+      </div>
+    </section>
+
+    <section class="clause" id="s30">
+      <h2><span class="num">30</span>GOVERNING LAW</h2>
+      <p>This Privacy Policy shall be governed by the applicable laws of India. Any dispute relating to this Privacy Policy shall be subject to the jurisdiction of the appropriate courts under applicable law.</p>
+    </section>
+
+    <section class="clause" id="s31">
+      <h2><span class="num">31</span>CONTACT US</h2>
+      <p>If you have any questions regarding this Privacy Policy or how ConnectX handles personal information, please contact our Privacy Support or Grievance Officer using the details above.</p>
+      <p>ConnectX is committed to building a safer, more respectful, and privacy-conscious dating experience.</p>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  © 2026 ConnectX. All rights reserved. Made with <span class="heart">♥</span> for safer connections.
+</footer>
+
+<script>
+  // Highlight active TOC entry on scroll
+  const sections = document.querySelectorAll('section.clause');
+  const links = document.querySelectorAll('nav.toc a');
+  const map = new Map();
+  links.forEach(a => map.set(a.getAttribute('href').slice(1), a));
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const link = map.get(entry.target.id);
+      if (!link) return;
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -75% 0px', threshold: 0 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

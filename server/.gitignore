@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.example
+uploads/photos/*
+uploads/audio/*
+!uploads/photos/.gitkeep
+!uploads/audio/.gitkeep
+coverage/
+.nyc_output/
+*.log
+dist/
+build/
+.DS_Store
+Thumbs.db

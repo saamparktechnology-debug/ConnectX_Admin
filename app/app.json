@@ -1,0 +1,78 @@
+{
+  "expo": {
+    "name": "ConnectX",
+    "slug": "connectx",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo.jpeg",
+    "userInterfaceStyle": "light",
+    "owner": "ramesh2911",
+    "extra": {
+      "eas": {
+        "projectId": "40f93ce7-ce07-4027-a341-f83b0b0a22be"
+      }
+    },
+    "splash": {
+      "image": "./assets/images/logo.jpeg",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF0EB"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ramesh2911.connectx",
+      "infoPlist": {
+        "NSCameraUsageDescription": "ConnectX needs camera access for profile photos",
+        "NSPhotoLibraryUsageDescription": "ConnectX needs photo library access",
+        "NSMicrophoneUsageDescription": "ConnectX needs microphone for voice calls"
+      }
+    },
+    "android": {
+      "package": "com.ramesh2911.connectx",
+      "versionCode": 4,
+      "targetSdkVersion": 36,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo.jpeg",
+        "backgroundColor": "#FFF0EB"
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/images/logo.jpeg",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "ConnectX needs camera access for profile photos"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "ConnectX needs photo library access"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "buildToolsVersion": "36.0.0"
+          }
+        }
+      ],
+      "expo-asset"
+    ],
+    "scheme": "connectx"
+  }
+}
