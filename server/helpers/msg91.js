@@ -37,11 +37,10 @@ const sendOtp = async (phone) => {
     console.log('Extracted requestId:', requestId);
 
     if (!requestId) {
-      console.error('No requestId found in MSG91 response:', JSON.stringify(response.data));
-      throw new Error('Failed to get request ID from MSG91');
+      console.warn('No requestId found in MSG91 response. Response keys:', Object.keys(response.data || {}));
     }
 
-    return { success: true, requestId };
+    return { success: true, requestId: requestId || null };
   } catch (error) {
     console.log('MSG91 sendOtp failed:', JSON.stringify(error.response?.data || error.message));
     throw error;
