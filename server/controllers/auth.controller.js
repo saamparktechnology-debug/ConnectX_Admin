@@ -113,7 +113,11 @@ exports.sendOtp = async (req, res) => {
 
     const result = await msg91.sendOtp(phone);
 
-    await authQueries.storeOtpSession(phone, result.requestId);
+    try {
+      await authQueries.storeOtpSession(phone, result.requestId);
+    } catch (dbErr) {
+      console.error('Failed to store OTP session in DB (otp_sessions table may not exist):', dbErr.message);
+    }
 
     console.log(`OTP sent to ${phone} via MSG91, requestId: ${result.requestId}`);
 
