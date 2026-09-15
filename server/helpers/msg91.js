@@ -11,6 +11,7 @@ const extractRequestId = (responseData) => {
   if (responseData.requestId) return String(responseData.requestId);
   if (responseData.data && responseData.data.request_id) return String(responseData.data.request_id);
   if (responseData.data && responseData.data.requestId) return String(responseData.data.requestId);
+  if (responseData.message && responseData.type === 'success') return String(responseData.message);
   return null;
 };
 
