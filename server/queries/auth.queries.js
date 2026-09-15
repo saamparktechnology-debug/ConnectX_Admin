@@ -65,7 +65,29 @@ const setUserOnline = async (userId, isOnline) => {
   await db.query('UPDATE users SET is_online = ? WHERE id = ?', [isOnline, userId]);
 };
 
+const storeOtpSession = async (phone, requestId) => {
+  await db.query(
+    `INSERT INTO otp_sessions (phone, request_id, expires_at)
+     VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))
+     ON DUPLICATE KEY UPDATE request_id = VALUES(request_id), expires_at = VALUES(expires_at), created_at = NOW()`,
+    [phone, requestId]
+  );
+};
+
+const getOtpSession = async (phone) => {
+  const [rows] = await db.query(
+    'SELECT * FROM otp_sessions WHERE phone = ? AND expires_at > NOW()',
+    [phone]
+  );
+  return rows[0] || null;
+};
+
+const deleteOtpSession = async (phone) => {
+  await db.query('DELETE FROM otp_sessions WHERE phone = ?', [phone]);
+};
+
 module.exports = {
   createUser, findUserByEmail, findUserByPhone, findUserById,
-  updateUser, updateLastActive, setUserOnline
+  updateUser, updateLastActive, setUserOnline,
+  storeOtpSession, getOtpSession, deleteOtpSession
 };

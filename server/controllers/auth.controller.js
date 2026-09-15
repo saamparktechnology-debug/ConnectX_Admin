@@ -7,8 +7,6 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 };
 
-const otpStore = new Map();
-
 exports.register = async (req, res) => {
   try {
     const { name, email, phone, password, gender, date_of_birth, language } = req.body;
@@ -115,12 +113,9 @@ exports.sendOtp = async (req, res) => {
 
     const result = await msg91.sendOtp(phone);
 
-    if (result.otp) {
-      const expiresAt = Date.now() + 5 * 60 * 1000;
-      otpStore.set(phone, { otp: result.otp, expiresAt });
-    }
+    await authQueries.storeOtpSession(phone, result.requestId);
 
-    console.log(`OTP sent to ${phone} via MSG91`);
+    console.log(`OTP sent to ${phone} via MSG91, requestId: ${result.requestId}`);
 
     res.json({
       success: true,
@@ -140,23 +135,47 @@ exports.verifyOtp = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Phone and OTP are required.' });
     }
 
-    const stored = otpStore.get(phone);
+    const stored = await authQueries.getOtpSession(phone);
     if (!stored) {
       return res.status(400).json({ success: false, message: 'OTP not found. Please request a new one.' });
     }
-    if (Date.now() > stored.expiresAt) {
-      otpStore.delete(phone);
-      return res.status(400).json({ success: false, message: 'OTP expired. Please request a new one.' });
-    }
-    if (stored.otp !== otp) {
-      return res.status(400).json({ success: false, message: 'Invalid OTP.' });
-    }
 
-    otpStore.delete(phone);
+    await msg91.verifyOtp(phone, otp, stored.request_id);
+
+    await authQueries.deleteOtpSession(phone);
     return await completeLogin(phone, res);
   } catch (error) {
-    console.error('Verify OTP error:', error);
-    res.status(400).json({ success: false, message: error.message || 'Invalid OTP.' });
+    console.error('Verify OTP error:', error.response?.data || error.message);
+    res.status(400).json({ success: false, message: error.response?.data?.message || 'Invalid OTP.' });
+  }
+};
+
+exports.resendOtp = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone || phone.length < 10) {
+      return res.status(400).json({ success: false, message: 'Valid phone number is required.' });
+    }
+
+    const stored = await authQueries.getOtpSession(phone);
+    if (!stored) {
+      return res.status(400).json({ success: false, message: 'No OTP session found. Please send OTP first.' });
+    }
+
+    await msg91.retryOtp(phone, stored.request_id);
+
+    await authQueries.storeOtpSession(phone, stored.request_id);
+
+    console.log(`OTP resent to ${phone} via MSG91`);
+
+    res.json({
+      success: true,
+      message: 'OTP resent successfully.',
+      data: { phone }
+    });
+  } catch (error) {
+    console.error('Resend OTP error:', error.response?.data || error.message);
+    res.status(500).json({ success: false, message: 'Server error resending OTP.' });
   }
 };
 

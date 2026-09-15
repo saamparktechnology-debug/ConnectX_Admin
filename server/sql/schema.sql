@@ -342,6 +342,16 @@ CREATE TABLE wallet_transactions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE otp_sessions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    phone VARCHAR(20) NOT NULL UNIQUE,
+    request_id VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_phone (phone),
+    INDEX idx_expires (expires_at)
+);
+
 CREATE TABLE experts (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL UNIQUE,
