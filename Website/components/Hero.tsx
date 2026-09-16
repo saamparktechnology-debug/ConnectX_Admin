@@ -1,4 +1,10 @@
+"use client";
+
+import { useState } from "react";
+import ExpertModal from "./ExpertModal";
+
 export default function Hero() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <section className="relative overflow-hidden bg-ink-900">
       <div className="pointer-events-none absolute inset-0 bg-glow-radial" />
@@ -22,13 +28,15 @@ export default function Hero() {
           >
             Download the app
           </a> */}
-          <a
-            href="#experts"
-            className="btn-focus w-full rounded-full border border-white/20 px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:border-white/40 hover:bg-white/5 sm:w-auto"
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="btn-focus w-full rounded-full border border-white/20 px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:border-white/40 hover:bg-white/5 sm:w-auto cursor-pointer"
           >
             Become an Expert
-          </a>
+          </button>
         </div>
+
+        <ExpertModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
         <div className="hero-rise hero-rise-4 mt-16 grid gap-5 sm:grid-cols-3">
           <HighlightCard

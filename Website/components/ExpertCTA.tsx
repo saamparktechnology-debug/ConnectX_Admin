@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import ExpertModal from "./ExpertModal";
+
 const perks = [
   "Set your own rate and availability",
   "Get paid weekly, straight to your bank",
@@ -6,6 +11,8 @@ const perks = [
 ];
 
 export default function ExpertCTA() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <section id="experts" className="bg-ink-800 py-20 md:py-28">
       <div className="container-x">
@@ -19,12 +26,12 @@ export default function ExpertCTA() {
               wellness, or any field people ask for advice on, ConnectX gives
               you an audience — and a private, structured way to help them.
             </p>
-            <a
-              href="#download"
-              className="btn-focus mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-ink-900 transition-transform hover:-translate-y-0.5"
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="btn-focus mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-ink-900 transition-transform hover:-translate-y-0.5 cursor-pointer"
             >
               Apply to become an expert
-            </a>
+            </button>
           </div>
           <ul className="space-y-4">
             {perks.map((perk) => (
@@ -46,6 +53,8 @@ export default function ExpertCTA() {
           </ul>
         </div>
       </div>
+
+      <ExpertModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </section>
   );
 }

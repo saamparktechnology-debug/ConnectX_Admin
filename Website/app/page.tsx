@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Stats from "@/components/Stats";
+import Carousel from "@/components/Carousel";
 import HowItWorks from "@/components/HowItWorks";
 import Features from "@/components/Features";
 import ExpertCTA from "@/components/ExpertCTA";
@@ -16,6 +17,7 @@ export default function Home() {
       <main>
         <Hero />
         <Stats />
+        <Carousel />
         <HowItWorks />
         <Features />
         <ExpertCTA />
