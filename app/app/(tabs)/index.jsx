@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, RefreshControl, ActivityIndicator, Alert, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, RefreshControl, ActivityIndicator, Alert, TextInput, Dimensions, Animated as RNAnimated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import api from '../../services/api';
 import useAuthStore from '../../store/useAuthStore';
 import { COLORS, SPACING, RADIUS } from '../../utils/constants';
+import { getAvatarSource } from '../../utils/avatar';
 
 const categories = [
   { id: 'all', label: 'All' },
@@ -14,6 +15,125 @@ const categories = [
   { id: 'marriage', label: 'Marriage' },
   { id: 'confidence', label: 'Confidence' },
 ];
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARD_WIDTH = SCREEN_WIDTH - 48;
+const AUTO_SCROLL_INTERVAL = 3500;
+
+const friendshipQuotes = [
+  { quote: "A real friend is one who walks in when the rest of the world walks out.", emoji: "💗", gradient: ['#FF6B6B', '#FF8E8E'], author: "Walter Winchell" },
+  { quote: "Friendship is the golden thread that ties the hearts of the world together.", emoji: "🤝", gradient: ['#A78BFA', '#818CF8'], author: "" },
+  { quote: "True friendship is a rare treasure — honest, unconditional, and always near.", emoji: "💛", gradient: ['#FBBF24', '#F59E0B'], author: "" },
+  { quote: "A friend is someone who knows all about you and still loves you.", emoji: "✨", gradient: ['#34D399', '#10B981'], author: "Elbert Hubbard" },
+  { quote: "The language of friendship is not words but meanings.", emoji: "🌸", gradient: ['#F472B6', '#EC4899'], author: "Henry David Thoreau" },
+  { quote: "Friendship multiplies the joys and divides the sorrows.", emoji: "🤗", gradient: ['#60A5FA', '#3B82F6'], author: "Unknown" },
+  { quote: "A sweet friendship refreshes the soul like morning dew.", emoji: "🌅", gradient: ['#FB923C', '#F97316'], author: "" },
+];
+
+const FemaleHomeSection = () => {
+  const scrollX = useRef(new RNAnimated.Value(0)).current;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef(null);
+  const fadeAnim = useRef(new RNAnimated.Value(1)).current;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => {
+        const next = (prev + 1) % friendshipQuotes.length;
+        RNAnimated.sequence([
+          RNAnimated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+          RNAnimated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        ]).start();
+        if (flatListRef.current) {
+          flatListRef.current.scrollToOffset({ offset: next * CARD_WIDTH, animated: true });
+        }
+        return next;
+      });
+    }, AUTO_SCROLL_INTERVAL);
+    return () => clearInterval(interval);
+  }, []);
+
+  const onScroll = useRef(RNAnimated.event(
+    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+    { useNativeDriver: false }
+  )).current;
+
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    if (viewableItems.length > 0) {
+      setCurrentIndex(viewableItems[0].index || 0);
+    }
+  }).current;
+
+  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+
+  return (
+    <View style={femaleStyles.container}>
+      <View style={femaleStyles.header}>
+        <View>
+          <Text style={femaleStyles.welcomeText}>Welcome to ConnectX</Text>
+          <Text style={femaleStyles.subtitle}>Where friendships bloom</Text>
+        </View>
+      </View>
+
+      <RNAnimated.View style={{ opacity: fadeAnim }}>
+        <RNAnimated.FlatList
+          ref={flatListRef}
+          data={friendshipQuotes}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={onScroll}
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
+          snapToInterval={CARD_WIDTH}
+          snapToAlignment="center"
+          decelerationRate="fast"
+          keyExtractor={(_, i) => i.toString()}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
+          renderItem={({ item }) => (
+            <View style={[femaleStyles.quoteCard, { width: CARD_WIDTH }]}>
+              <LinearGradient colors={item.gradient} style={femaleStyles.quoteGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                <Text style={femaleStyles.quoteEmoji}>{item.emoji}</Text>
+                <Text style={femaleStyles.quoteText}>"{item.quote}"</Text>
+                {item.author ? <Text style={femaleStyles.quoteAuthor}>— {item.author}</Text> : null}
+              </LinearGradient>
+            </View>
+          )}
+        />
+      </RNAnimated.View>
+
+      <View style={femaleStyles.dotsContainer}>
+        {friendshipQuotes.map((_, i) => (
+          <View key={i} style={[femaleStyles.dot, currentIndex === i && femaleStyles.dotActive]} />
+        ))}
+      </View>
+
+      <View style={femaleStyles.bottomSection}>
+        <View style={femaleStyles.infoCard}>
+          <Text style={femaleStyles.infoEmoji}>🎯</Text>
+          <View style={femaleStyles.infoContent}>
+            <Text style={femaleStyles.infoTitle}>Start Earning Today</Text>
+            <Text style={femaleStyles.infoText}>Receive calls from verified users and earn money. Complete your KYC to start.</Text>
+          </View>
+        </View>
+        <View style={femaleStyles.infoCard}>
+          <Text style={femaleStyles.infoEmoji}>🔒</Text>
+          <View style={femaleStyles.infoContent}>
+            <Text style={femaleStyles.infoTitle}>Safe & Secure</Text>
+            <Text style={femaleStyles.infoText}>Your privacy is our priority. All calls are confidential and secure.</Text>
+          </View>
+        </View>
+        <View style={femaleStyles.infoCard}>
+          <Text style={femaleStyles.infoEmoji}>💎</Text>
+          <View style={femaleStyles.infoContent}>
+            <Text style={femaleStyles.infoTitle}>Bonus Offers</Text>
+            <Text style={femaleStyles.infoText}>Accept bonus offers from admin and earn extra rewards for talking.</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
 
 const ExpertCard = ({ expert, onCall, callRate, isFemale }) => (
   <View style={styles.expertCard}>
@@ -180,7 +300,7 @@ export default function HomeScreen() {
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/(tabs)/profile')}>
-              <Image source={{ uri: user?.primary_photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'user'}` }} style={styles.headerAvatar} />
+              <Image source={getAvatarSource(user)} style={styles.headerAvatar} />
             </TouchableOpacity>
           </View>
         </View>
@@ -232,10 +352,12 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Featured Experts</Text>
-          <Text style={styles.sectionCount}>{experts.length} available</Text>
-        </View>
+        {!isFemale && (
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Featured Experts</Text>
+            <Text style={styles.sectionCount}>{experts.length} available</Text>
+          </View>
+        )}
 
         {!isFemale && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
@@ -263,6 +385,8 @@ export default function HomeScreen() {
               <Text style={styles.retryText}>Retry</Text>
             </TouchableOpacity>
           </View>
+        ) : isFemale ? (
+          <FemaleHomeSection />
         ) : filteredExperts.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Ionicons name={searchQuery ? "search-outline" : "people-outline"} size={64} color={COLORS.textMuted} />
@@ -411,4 +535,51 @@ const styles = StyleSheet.create({
   emptyContainer: { alignItems: 'center', paddingVertical: 40, gap: 8 },
   emptyText: { fontSize: 16, fontWeight: '600', color: COLORS.textSecondary },
   emptySubtext: { fontSize: 13, color: COLORS.textMuted },
+});
+
+const femaleStyles = StyleSheet.create({
+  container: { paddingBottom: 100 },
+  header: {
+    paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.lg,
+  },
+  welcomeText: { fontSize: 22, fontWeight: '800', color: COLORS.textPrimary },
+  subtitle: { fontSize: 14, color: COLORS.textMuted, marginTop: 2 },
+  quoteCard: {
+    height: 220, borderRadius: RADIUS.xl, overflow: 'hidden',
+    marginRight: 16, shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15,
+    shadowRadius: 12, elevation: 6,
+  },
+  quoteGradient: {
+    flex: 1, padding: SPACING.xl, justifyContent: 'center', alignItems: 'center',
+  },
+  quoteEmoji: { fontSize: 40, marginBottom: 16 },
+  quoteText: {
+    fontSize: 17, fontWeight: '600', color: COLORS.white, textAlign: 'center',
+    lineHeight: 26, fontStyle: 'italic',
+  },
+  quoteAuthor: {
+    fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 12, fontWeight: '500',
+  },
+  dotsContainer: {
+    flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: SPACING.lg,
+  },
+  dot: {
+    width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.border,
+  },
+  dotActive: { width: 24, backgroundColor: COLORS.primary },
+  bottomSection: {
+    paddingHorizontal: SPACING.lg, marginTop: SPACING.xl, gap: 12,
+  },
+  infoCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    backgroundColor: COLORS.white, padding: SPACING.lg, borderRadius: RADIUS.xl,
+    borderWidth: 1, borderColor: COLORS.border,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+  },
+  infoEmoji: { fontSize: 32 },
+  infoContent: { flex: 1 },
+  infoTitle: { fontSize: 15, fontWeight: '700', color: COLORS.textPrimary },
+  infoText: { fontSize: 13, color: COLORS.textMuted, marginTop: 2, lineHeight: 18 },
 });

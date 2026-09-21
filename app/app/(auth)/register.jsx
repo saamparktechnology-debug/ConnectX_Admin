@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator, Modal, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator, Modal, FlatList, Image, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -8,14 +8,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useAuthStore from '../../store/useAuthStore';
 import { COLORS, SPACING, RADIUS, API_URL } from '../../utils/constants';
 
+const { width } = Dimensions.get('window');
+
 export default function RegisterScreen() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState('phone');
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [gender, setGender] = useState('');
   const [dob, setDob] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // OTP state
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '']);
+  const [timer, setTimer] = useState(0);
+  const otpRefs = [useRef(), useRef(), useRef(), useRef()];
 
   // KYC state
   const [aadharNumber, setAadharNumber] = useState('');
@@ -39,7 +45,7 @@ export default function RegisterScreen() {
   const recordingRef = useRef(null);
   const timerRef = useRef(null);
 
-  const { register } = useAuthStore();
+  const { sendOtp, verifyOtp, resendOtp } = useAuthStore();
   const router = useRouter();
 
   const handleDobChange = (text) => {
@@ -94,7 +100,7 @@ export default function RegisterScreen() {
     konkani: 'Mhojem naum ani mi hya applicationak ek upyogkari mhojea khatir zudiyetam.',
     maithili: 'हमर नाम अछि आओर हम एहि एप्लिकेशनमे एक प्रयोगकर्ता के रूपमे जुड़ रहल छी।',
     malayalam: 'എന്റെ പേര് ആണ്, ഞാൻ ഈ ആപ്ലിക്കേഷനിൽ ഒരു ഉപയോക്താവായി ചേരുന്നു।',
-    manipuri: 'ollectorsꯝꯁꯤꯡ ꯀꯨꯝꯕꯗꯨꯅꯌꯨ ꯑꯁꯤ ꯀꯩꯛꯁꯠꯂꯛꯁꯤꯡꯗꯤ ꯀꯃꯕꯛꯇꯣꯛꯁꯠꯃꯤ।',
+    manipuri: 'ドイꯝꯁꯤꯡ ꯀꯨꯝꯕꯗꯨꯅꯌꯨ ꯑꯁꯤ ꯀꯩꯛꯁꯠꯂꯛꯁꯤꯡꯗꯤ ꯀꯃꯕꯛꯇꯣꯛꯁꯠꯃꯤ।',
     marathi: 'माझे नाव आहे आणि मी या अॅप्लिकेशनमध्ये एक वापरकर्ता म्हणून सामील होत आहे।',
     nepali: 'मेरो नाम छ र म यो एप्लिकेशनमा एक प्रयोगकर्ताको रूपमा जोडिँदैछु।',
     odia: 'ମୋ ନାମ ଅଟେ ଏବଂ ମୁଁ ଏହି ଆପ୍ଲିକେସନରେ ଜଣେ ବ୍ୟବହାରକାରୀ ଭାବରେ ଯୋଗ ଦେଉଛି।',
@@ -108,29 +114,42 @@ export default function RegisterScreen() {
   };
 
   const getMaxStep = () => {
-    if (gender === 'female') return 5;
-    return 2;
+    return gender === 'female' ? 7 : 4;
+  };
+
+  const getStepNumber = () => {
+    if (step === 'phone') return 1;
+    if (step === 'otp') return 2;
+    if (step === 3) return 3;
+    if (step === 4) return 4;
+    if (step === 5) return 5;
+    if (step === 6) return 6;
+    if (step === 7) return 7;
+    return 1;
+  };
+
+  const handleBack = () => {
+    if (step === 'otp') setStep('phone');
+    else if (step === 3) setStep('otp');
+    else if (step === 4) setStep(3);
+    else if (step === 5) setStep(4);
+    else if (step === 6) setStep(5);
+    else if (step === 7) setStep(6);
+    else router.back();
   };
 
   const handleNext = () => {
-    if (step === 1) {
+    if (step === 3) {
       if (!gender) return Alert.alert('Error', 'Please select your gender');
-      setStep(2);
-    } else if (step === 2) {
-      if (!name.trim()) return Alert.alert('Error', 'Please enter your name');
-      if (!email.trim() && !phone.trim()) return Alert.alert('Error', 'Please enter email or phone');
-      if (email && !/^\S+@\S+\.\S+$/.test(email)) return Alert.alert('Error', 'Please enter a valid email');
-      if (phone && phone.length < 10) return Alert.alert('Error', 'Please enter a valid 10-digit phone number');
+      setStep(4);
+    } else if (step === 4) {
+      if (!name.trim()) return Alert.alert('Error', 'Please enter your Nick Name');
       if (gender === 'female') {
         if (!dob.trim()) return Alert.alert('Error', 'Please enter your date of birth');
         if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dob)) return Alert.alert('Error', 'Please enter date in DD/MM/YYYY format');
       }
-      if (gender === 'male') {
-        handleRegister();
-      } else {
-        handleRegister();
-      }
-    } else if (step === 3) {
+      handleUpdateProfile();
+    } else if (step === 5) {
       if (!aadharNumber.trim() || aadharNumber.length !== 12) return Alert.alert('Error', 'Please enter a valid 12-digit Aadhar number');
       if (!panNumber.trim() || panNumber.length !== 10) return Alert.alert('Error', 'Please enter a valid 10-character PAN number');
       if (paymentMethod === 'bank') {
@@ -141,36 +160,122 @@ export default function RegisterScreen() {
       } else {
         if (!upiId.trim()) return Alert.alert('Error', 'Please enter UPI ID');
       }
-      setStep(4);
-    } else if (step === 4) {
+      setStep(6);
+    } else if (step === 6) {
       if (!selectedLanguage) return Alert.alert('Error', 'Please select a language');
       if (!recordedUri) return Alert.alert('Error', 'Please record a voice note');
-      setStep(5);
+      setStep(7);
     }
   };
 
-  const handleRegister = async () => {
-    if (!name.trim()) return Alert.alert('Error', 'Please enter your name');
-    if (!email.trim() && !phone.trim()) return Alert.alert('Error', 'Please enter email or phone');
-    if (email && !/^\S+@\S+\.\S+$/.test(email)) return Alert.alert('Error', 'Please enter a valid email');
-    if (phone && phone.length < 10) return Alert.alert('Error', 'Please enter a valid 10-digit phone number');
-    if (!gender) return Alert.alert('Error', 'Please select your gender');
-
+  const handleSendOtp = async () => {
+    if (phone.length < 10) {
+      Alert.alert('Error', 'Please enter a valid 10-digit phone number');
+      return;
+    }
     setLoading(true);
     try {
-      const dobFormatted = dob ? dob.split('/').reverse().join('-') : null;
-      await register({ name, email, phone, password: null, gender, date_of_birth: dobFormatted, language: selectedLanguage || null });
+      await sendOtp(phone);
+      setStep('otp');
+      startTimer();
+    } catch (error) {
+      Alert.alert('Error', error.response?.data?.message || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      if (gender === 'female') {
-        setStep(3);
-        setLoading(false);
+  const startTimer = () => {
+    setTimer(30);
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) { clearInterval(interval); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleOtpChange = (text, index) => {
+    if (text.length > 1) text = text.slice(-1);
+    const newOtp = [...otp];
+    newOtp[index] = text;
+    setOtp(newOtp);
+    if (text && index < 3) otpRefs[index + 1].current?.focus?.();
+    if (newOtp.every((digit) => digit !== '')) {
+      setTimeout(() => handleVerifyOtp(newOtp.join('')), 300);
+    }
+  };
+
+  const handleKeyPress = (e, index) => {
+    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
+      otpRefs[index - 1].current?.focus?.();
+      const newOtp = [...otp];
+      newOtp[index - 1] = '';
+      setOtp(newOtp);
+    }
+  };
+
+  const handleVerifyOtp = async (otpValue) => {
+    if (!otpValue) otpValue = otp.join('');
+    if (otpValue.length !== 4) {
+      Alert.alert('Error', 'Please enter 4-digit OTP');
+      return;
+    }
+    setLoading(true);
+    try {
+      await verifyOtp(phone, otpValue);
+      setStep(3);
+    } catch (error) {
+      const msg = error.response?.data?.message || error.message || 'Invalid OTP. Please try again.';
+      Alert.alert('Verify Failed', msg);
+      setOtp(['', '', '', '']);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (timer > 0) return;
+    try {
+      setLoading(true);
+      await resendOtp(phone);
+      Alert.alert('Success', 'OTP resent successfully');
+      startTimer();
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Failed to resend OTP. Please try sending again.';
+      Alert.alert('Resend Failed', msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    setLoading(true);
+    try {
+      const token = await AsyncStorage.getItem('user_token');
+      const response = await fetch(`${API_URL}/user/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name, gender, email: null, date_of_birth: dob ? dob.split('/').reverse().join('-') : null }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Profile update failed');
+      }
+
+      if (gender === 'male') {
+        Alert.alert('Success', 'Account created successfully!');
+        router.replace('/(tabs)');
         return;
       }
 
-      Alert.alert('Success', 'Registration successful! Please login.');
-      router.replace('/(auth)/login');
+      setStep(5);
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || 'Registration failed');
+      Alert.alert('Error', error.message || 'Profile update failed');
     } finally {
       setLoading(false);
     }
@@ -343,20 +448,82 @@ export default function RegisterScreen() {
   };
 
   const renderProgressBar = () => {
+    const currentNum = getStepNumber();
     const maxStep = getMaxStep();
     return (
       <View>
         <View style={styles.progress}>
           {Array.from({ length: maxStep }, (_, i) => i + 1).map((s) => (
-            <View key={s} style={[styles.progressDot, s <= step && styles.progressDotActive]} />
+            <View key={s} style={[styles.progressDot, s <= currentNum && styles.progressDotActive]} />
           ))}
         </View>
-        <Text style={styles.stepText}>Step {step} of {maxStep}</Text>
+        <Text style={styles.stepText}>Step {currentNum} of {maxStep}</Text>
       </View>
     );
   };
 
-  const renderStep1 = () => (
+  const renderPhoneStep = () => (
+    <View style={styles.form}>
+      <Text style={styles.formTitle}>Phone Verification</Text>
+      <Text style={styles.formSubtitle}>Enter your phone number to get started</Text>
+
+      <View style={styles.phoneContainer}>
+        <View style={styles.countryCode}>
+          <Text style={styles.countryCodeText}>+91</Text>
+        </View>
+        <TextInput style={styles.phoneInput} placeholder="Phone Number" placeholderTextColor={COLORS.textMuted}
+          value={phone} onChangeText={setPhone} keyboardType="phone-pad" maxLength={10} />
+      </View>
+
+      <TouchableOpacity onPress={handleSendOtp} disabled={loading} activeOpacity={0.8}>
+        <LinearGradient colors={COLORS.gradient.call} style={styles.nextButton}>
+          {loading ? <ActivityIndicator color="white" size="small" /> : (
+            <>
+              <Text style={styles.nextButtonText}>Continue</Text>
+              <Ionicons name="arrow-forward" size={20} color="white" />
+            </>
+          )}
+        </LinearGradient>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderOtpStep = () => (
+    <View style={styles.form}>
+      <Text style={styles.formTitle}>Verify OTP</Text>
+      <Text style={styles.formSubtitle}>Enter 4-digit OTP sent to</Text>
+      <Text style={styles.phoneText}>+91 {phone}</Text>
+
+      <View style={styles.otpContainer}>
+        {otp.map((digit, index) => (
+          <TextInput key={index} ref={otpRefs[index]}
+            style={[styles.otpInput, digit ? styles.otpInputFilled : null]}
+            value={digit} onChangeText={(text) => handleOtpChange(text, index)}
+            onKeyPress={(e) => handleKeyPress(e, index)}
+            keyboardType="number-pad" maxLength={1} selectTextOnFocus />
+        ))}
+      </View>
+
+      {loading && <View style={styles.verifying}><ActivityIndicator color={COLORS.primary} size="small" /><Text style={styles.verifyingText}>Verifying...</Text></View>}
+
+      <TouchableOpacity onPress={() => handleVerifyOtp()} disabled={loading} activeOpacity={0.8}>
+        <LinearGradient colors={COLORS.gradient.call} style={styles.nextButton}>
+          {loading ? <ActivityIndicator color="white" size="small" /> : (
+            <>
+              <Text style={styles.nextButtonText}>Verify OTP</Text>
+              <Ionicons name="checkmark-circle" size={20} color="white" />
+            </>
+          )}
+        </LinearGradient>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleResendOtp} disabled={timer > 0} style={styles.resendButton}>
+        <Text style={[styles.resendText, timer > 0 && styles.resendDisabled]}>{timer > 0 ? `Resend OTP in ${timer}s` : 'Resend OTP'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderGenderStep = () => (
     <View style={styles.form}>
       <Text style={styles.formTitle}>Select Gender</Text>
       <Text style={styles.formSubtitle}>Help us find better matches for you</Text>
@@ -379,22 +546,14 @@ export default function RegisterScreen() {
     </View>
   );
 
-  const renderStep2 = () => (
+  const renderCreateAccountStep = () => (
     <View style={styles.form}>
       <Text style={styles.formTitle}>Create Account</Text>
-      <Text style={styles.formSubtitle}>Tell us about yourself</Text>
+      <Text style={styles.formSubtitle}>Choose a Nick Name for your profile</Text>
 
       <View style={styles.inputContainer}>
         <Ionicons name="person-outline" size={20} color={COLORS.textMuted} style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Full Name" placeholderTextColor={COLORS.textMuted} value={name} onChangeText={setName} />
-      </View>
-      <View style={styles.inputContainer}>
-        <Ionicons name="mail-outline" size={20} color={COLORS.textMuted} style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Email" placeholderTextColor={COLORS.textMuted} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-      </View>
-      <View style={styles.inputContainer}>
-        <Ionicons name="call-outline" size={20} color={COLORS.textMuted} style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Phone Number" placeholderTextColor={COLORS.textMuted} value={phone} onChangeText={setPhone} keyboardType="phone-pad" maxLength={10} />
+        <TextInput style={styles.input} placeholder="Nick Name" placeholderTextColor={COLORS.textMuted} value={name} onChangeText={setName} />
       </View>
       {gender === 'female' && (
         <View style={styles.inputContainer}>
@@ -403,16 +562,20 @@ export default function RegisterScreen() {
         </View>
       )}
 
-      <TouchableOpacity onPress={handleNext} activeOpacity={0.8}>
-        <LinearGradient colors={COLORS.gradient.call} style={styles.nextButton}>
-          <Text style={styles.nextButtonText}>Continue</Text>
-          <Ionicons name="arrow-forward" size={20} color="white" />
+      <TouchableOpacity onPress={handleNext} disabled={loading || !name.trim()} activeOpacity={0.8}>
+        <LinearGradient colors={COLORS.gradient.call} style={[styles.nextButton, (!name.trim() || loading) && styles.disabledButton]}>
+          {loading ? <ActivityIndicator color="white" size="small" /> : (
+            <>
+              <Text style={styles.nextButtonText}>{gender === 'male' ? 'Create Account' : 'Continue'}</Text>
+              <Ionicons name={gender === 'male' ? 'checkmark-circle-outline' : 'arrow-forward'} size={20} color="white" />
+            </>
+          )}
         </LinearGradient>
       </TouchableOpacity>
     </View>
   );
 
-  const renderStep3 = () => (
+  const renderStep5 = () => (
     <View style={styles.form}>
       <Text style={styles.formTitle}>KYC Details</Text>
       <Text style={styles.formSubtitle}>Verification information for your safety</Text>
@@ -479,10 +642,9 @@ export default function RegisterScreen() {
     </View>
   );
 
-  const renderStep4 = () => (
+  const renderStep6 = () => (
     <View style={styles.form}>
       <Text style={styles.formTitle}>Voice Note</Text>
-      {/* <Text style={styles.formSubtitle}>Record a short voice introduction</Text> */}
 
       <View style={styles.infoBox}>
         <Ionicons name="information-circle-outline" size={20} color={COLORS.primary} />
@@ -613,8 +775,8 @@ export default function RegisterScreen() {
         body: JSON.stringify({ language: selectedLanguage }),
       });
 
-      Alert.alert('Success', 'Registration successful! Please login.');
-      router.replace('/(auth)/login');
+      Alert.alert('Success', 'Account created successfully!');
+      router.replace('/(tabs)');
     } catch (error) {
       Alert.alert('Error', error.response?.data?.message || 'KYC submission failed');
     } finally {
@@ -622,7 +784,7 @@ export default function RegisterScreen() {
     }
   };
 
-  const renderStep5 = () => (
+  const renderStep7 = () => (
     <View style={styles.form}>
       <Text style={styles.formTitle}>Almost Done!</Text>
       <Text style={styles.formSubtitle}>Review your information and create your account</Text>
@@ -635,15 +797,9 @@ export default function RegisterScreen() {
         </View>
         <View style={styles.reviewDivider} />
         <View style={styles.reviewRow}>
-          <Ionicons name="mail-outline" size={18} color={COLORS.textMuted} />
-          <Text style={styles.reviewLabel}>Email</Text>
-          <Text style={styles.reviewValue}>{email || 'N/A'}</Text>
-        </View>
-        <View style={styles.reviewDivider} />
-        <View style={styles.reviewRow}>
           <Ionicons name="call-outline" size={18} color={COLORS.textMuted} />
           <Text style={styles.reviewLabel}>Phone</Text>
-          <Text style={styles.reviewValue}>{phone || 'N/A'}</Text>
+          <Text style={styles.reviewValue}>+91 {phone}</Text>
         </View>
         <View style={styles.reviewDivider} />
         <View style={styles.reviewRow}>
@@ -670,24 +826,28 @@ export default function RegisterScreen() {
 
   const renderCurrentStep = () => {
     switch (step) {
-      case 1: return renderStep1();
-      case 2: return renderStep2();
-      case 3: return renderStep3();
-      case 4: return renderStep4();
+      case 'phone': return renderPhoneStep();
+      case 'otp': return renderOtpStep();
+      case 3: return renderGenderStep();
+      case 4: return renderCreateAccountStep();
       case 5: return renderStep5();
-      default: return renderStep1();
+      case 6: return renderStep6();
+      case 7: return renderStep7();
+      default: return renderPhoneStep();
     }
   };
+
+  const showProgressBar = step !== 'phone';
 
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.headerContainer}>
-            <TouchableOpacity onPress={() => step > 1 ? setStep(step - 1) : router.back()} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
+            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+              <Text style={{ fontSize: 28, fontWeight: '700', color: COLORS.textPrimary, lineHeight: 44 }}>←</Text>
             </TouchableOpacity>
-            {renderProgressBar()}
+            {showProgressBar && renderProgressBar()}
           </View>
 
           {renderCurrentStep()}
@@ -708,7 +868,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   content: { paddingHorizontal: SPACING.xl, paddingTop: 60, paddingBottom: 40 },
   headerContainer: { marginBottom: 32 },
-  backButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
+  backButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
   progress: { flexDirection: 'row', gap: 8, marginTop: 20 },
   progressDot: { flex: 1, height: 4, borderRadius: 2, backgroundColor: COLORS.border },
   progressDotActive: { backgroundColor: COLORS.primary },
@@ -739,6 +899,30 @@ const styles = StyleSheet.create({
   footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 32 },
   footerText: { color: COLORS.textSecondary, fontSize: 14 },
   signinText: { color: COLORS.primary, fontSize: 14, fontWeight: '700' },
+
+  phoneContainer: { flexDirection: 'row', alignItems: 'center' },
+  countryCode: {
+    backgroundColor: COLORS.white, borderRadius: RADIUS.lg, paddingHorizontal: 16, height: 56,
+    justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border, marginRight: 8,
+  },
+  countryCodeText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600' },
+  phoneInput: {
+    flex: 1, backgroundColor: COLORS.white, borderRadius: RADIUS.lg, paddingHorizontal: 16, height: 56,
+    fontSize: 16, color: COLORS.textPrimary, borderWidth: 1, borderColor: COLORS.border,
+  },
+  phoneText: { fontSize: 16, color: COLORS.primary, fontWeight: '700', marginBottom: 4 },
+  otpContainer: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginVertical: 16 },
+  otpInput: {
+    width: 56, height: 56, backgroundColor: COLORS.white, borderRadius: RADIUS.lg,
+    textAlign: 'center', fontSize: 24, fontWeight: '700', color: COLORS.textPrimary,
+    borderWidth: 2, borderColor: COLORS.border,
+  },
+  otpInputFilled: { borderColor: COLORS.primary, backgroundColor: COLORS.pink },
+  verifying: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  verifyingText: { color: COLORS.textSecondary, fontSize: 14 },
+  resendButton: { alignItems: 'center', paddingVertical: 8 },
+  resendText: { color: COLORS.primary, fontSize: 14, fontWeight: '600' },
+  resendDisabled: { color: COLORS.textMuted },
 
   paymentToggle: {
     flexDirection: 'row', gap: 12, marginTop: 4,

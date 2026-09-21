@@ -1,4 +1,4 @@
-package com.ramesh0329.connectx
+package com.ramesh2911.connectx
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

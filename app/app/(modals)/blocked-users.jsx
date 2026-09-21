@@ -38,7 +38,7 @@ export default function BlockedUsersScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
+          <Text style={{ fontSize: 28, fontWeight: '700', color: COLORS.textPrimary, lineHeight: 44 }}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Blocked Users</Text>
         <View style={{ width: 36 }} />
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     paddingTop: 50, paddingHorizontal: SPACING.lg, paddingBottom: SPACING.md,
     backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.border,
   },
-  backButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.background, alignItems: 'center', justifyContent: 'center' },
+  backButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.background, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 18, fontWeight: '700', color: COLORS.textPrimary },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
   emptyText: { fontSize: 16, fontWeight: '600', color: COLORS.textSecondary },

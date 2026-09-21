@@ -158,7 +158,7 @@ export default function WithdrawHistoryScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+          <Text style={{ fontSize: 28, fontWeight: '700', color: COLORS.textPrimary, lineHeight: 44 }}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Withdrawal History</Text>
         <View style={{ width: 36 }} />
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     paddingTop: 50, paddingHorizontal: SPACING.lg, paddingBottom: SPACING.lg,
   },
   backButton: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.white,
+    width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.white,
     alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border,
   },
   title: { fontSize: 18, fontWeight: '700', color: COLORS.textPrimary },

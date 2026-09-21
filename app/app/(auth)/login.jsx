@@ -15,7 +15,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
   const otpRefs = [useRef(), useRef(), useRef(), useRef()];
-  const { sendOtp, verifyOtp } = useAuthStore();
+  const { sendOtp, verifyOtp, resendOtp } = useAuthStore();
   const router = useRouter();
 
   const handleSendOtp = async () => {
@@ -76,7 +76,8 @@ export default function LoginScreen() {
       await verifyOtp(phone, otpValue);
       router.replace('/(tabs)');
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || 'Invalid OTP');
+      const msg = error.response?.data?.message || error.message || 'Invalid OTP. Please try again.';
+      Alert.alert('Verify Failed', msg);
       setOtp(['', '', '', '']);
     } finally {
       setLoading(false);
@@ -87,10 +88,12 @@ export default function LoginScreen() {
     if (timer > 0) return;
     try {
       setLoading(true);
-      await sendOtp(phone);
+      await resendOtp(phone);
+      Alert.alert('Success', 'OTP resent successfully');
       startTimer();
     } catch (error) {
-      Alert.alert('Error', 'Failed to resend OTP');
+      const msg = error.response?.data?.message || 'Failed to resend OTP. Please try sending again.';
+      Alert.alert('Resend Failed', msg);
     } finally {
       setLoading(false);
     }
@@ -101,9 +104,7 @@ export default function LoginScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <View style={styles.content}>
           <View style={styles.headerContainer}>
-            <LinearGradient colors={COLORS.gradient.call} style={styles.logoBg}>
-              <Image source={require('../../assets/images/logo.jpeg')} style={styles.logoImage} />
-            </LinearGradient>
+            <Image source={require('../../assets/images/logo.jpeg')} style={styles.logoImage} />
             <Text style={styles.title}>ConnectX</Text>
             <Text style={styles.subtitle}>100% Real Friendships</Text>
             <Text style={styles.tagline}>Friends care about your thoughts, not your looks</Text>
@@ -170,15 +171,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   content: { flex: 1, paddingHorizontal: SPACING.xl, justifyContent: 'center' },
   headerContainer: { alignItems: 'center', marginBottom: 40 },
-  logoBg: {
-    width: 80, height: 80, borderRadius: 40,
-    alignItems: 'center', justifyContent: 'center',
-    shadowColor: COLORS.primary, shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3, shadowRadius: 12, elevation: 8,
-    overflow: 'hidden',
-  },
   logoImage: {
-    width: 80, height: 80, borderRadius: 40,
+    width: 120, height: 120, borderRadius: 20,
+    shadowColor: COLORS.primary, shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2, shadowRadius: 12, elevation: 6,
   },
   title: { fontSize: 36, fontWeight: '800', color: COLORS.textPrimary, fontStyle: 'italic', marginTop: 16 },
   subtitle: { fontSize: 16, color: COLORS.primary, fontWeight: '600', marginTop: 4 },

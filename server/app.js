@@ -12,6 +12,7 @@ const kycRoutes = require('./routes/kyc.routes');
 const withdrawalRoutes = require('./routes/withdrawal.routes');
 const femaleEarningsRoutes = require('./routes/femaleEarnings.routes');
 const adminFemaleEarningsRoutes = require('./routes/adminFemaleEarnings.routes');
+const paymentRoutes = require('./routes/payment.routes');
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use('/api/kyc', kycRoutes);
 app.use('/api/withdrawal', withdrawalRoutes);
 app.use('/api/female', femaleEarningsRoutes);
 app.use('/api/admin', adminFemaleEarningsRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'ConnectX API is running', timestamp: new Date().toISOString() });

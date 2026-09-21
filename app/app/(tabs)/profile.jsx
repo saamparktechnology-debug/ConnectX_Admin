@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import useAuthStore from '../../store/useAuthStore';
 import api from '../../services/api';
 import { COLORS, SPACING, RADIUS } from '../../utils/constants';
+import { getAvatarSource } from '../../utils/avatar';
 
 export default function ProfileScreen() {
   const { user, logout, updateUser } = useAuthStore();
@@ -77,9 +78,9 @@ export default function ProfileScreen() {
     ] : []),
     { icon: 'share-social-outline', label: 'Share Profile', route: null, color: COLORS.primary, action: 'share' },
     { icon: 'create-outline', label: 'Edit Profile', route: '/(modals)/edit-profile', color: COLORS.textSecondary },
-    { icon: 'images-outline', label: 'Manage Photos', route: '/(modals)/edit-photos', color: COLORS.textSecondary },
+    // { icon: 'images-outline', label: 'Manage Photos', route: '/(modals)/edit-photos', color: COLORS.textSecondary },
     { icon: 'settings-outline', label: 'Settings', route: '/(modals)/settings', color: COLORS.textSecondary },
-    { icon: 'ban-outline', label: 'Blocked Users', route: '/(modals)/blocked-users', color: COLORS.textSecondary },
+    // { icon: 'ban-outline', label: 'Blocked Users', route: '/(modals)/blocked-users', color: COLORS.textSecondary },
     { icon: 'shield-checkmark-outline', label: 'Safety Tips', route: null, color: COLORS.textSecondary },
     { icon: 'help-circle-outline', label: 'Help & Support', route: null, color: COLORS.textSecondary },
   ];
@@ -94,7 +95,7 @@ export default function ProfileScreen() {
       </View>
 
       <LinearGradient colors={[COLORS.primary + '15', COLORS.pink]} style={styles.profileCard}>
-        <Image source={{ uri: user?.primary_photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'user'}` }}
+        <Image source={getAvatarSource(user)}
           style={styles.avatar} />
         <Text style={styles.userName}>{user?.name || 'User'}</Text>
         {user?.dating_id && (

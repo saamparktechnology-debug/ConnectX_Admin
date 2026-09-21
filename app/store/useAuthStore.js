@@ -32,6 +32,11 @@ const useAuthStore = create((set, get) => ({
     return res.data;
   },
 
+  resendOtp: async (phone) => {
+    const res = await api.post('/auth/resend-otp', { phone });
+    return res.data;
+  },
+
   verifyOtp: async (phone, otp) => {
     const res = await api.post('/auth/verify-otp', { phone, otp });
     const { user, token } = res.data.data;

@@ -73,7 +73,7 @@ export default function EditPhotosScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+          <Text style={{ fontSize: 28, fontWeight: '700', color: COLORS.textPrimary, lineHeight: 44 }}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Manage Photos</Text>
         <Text style={styles.count}>{photos.length}/9</Text>
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     paddingTop: 50, paddingHorizontal: SPACING.lg, paddingBottom: SPACING.md,
     backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.border,
   },
-  backButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.background, alignItems: 'center', justifyContent: 'center' },
+  backButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.background, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 18, fontWeight: '700', color: COLORS.textPrimary },
   count: { color: COLORS.textMuted, fontSize: 14 },
   photoGrid: { flexDirection: 'row', flexWrap: 'wrap', padding: SPACING.lg, gap: SPACING.sm },

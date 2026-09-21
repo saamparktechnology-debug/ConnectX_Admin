@@ -648,7 +648,7 @@ export default function CallScreen() {
     return (
       <View style={styles.controls}>
         <TouchableOpacity style={styles.backToHome} onPress={handleGoBack}>
-          <Ionicons name="arrow-back" size={20} color={COLORS.white} />
+          <Text style={{ fontSize: 28, fontWeight: '700', color: COLORS.white }}>←</Text>
           <Text style={styles.backToHomeText}>Go Back</Text>
         </TouchableOpacity>
       </View>
@@ -662,7 +662,7 @@ export default function CallScreen() {
     <LinearGradient colors={[COLORS.dark[800], COLORS.dark[950]]} style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
+          <Text style={{ fontSize: 28, fontWeight: '700', color: COLORS.white, lineHeight: 44 }}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Voice Call</Text>
         <View style={{ width: 36 }} />
@@ -691,7 +691,7 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.md,
   },
   backButton: {
-    width: 36, height: 36, borderRadius: 18,
+    width: 44, height: 44, borderRadius: 22,
     backgroundColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center', justifyContent: 'center',
   },

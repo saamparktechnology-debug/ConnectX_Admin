@@ -1,0 +1,16 @@
+-- Cashfree Payment Gateway Migration
+-- Run this SQL on your MySQL database
+
+CREATE TABLE IF NOT EXISTS cf_orders (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  cf_order_id VARCHAR(100) NOT NULL,
+  order_id VARCHAR(100) NOT NULL UNIQUE,
+  amount DECIMAL(10,2) NOT NULL,
+  payment_status ENUM('ACTIVE','PAID','FAILED','EXPIRED') DEFAULT 'ACTIVE',
+  payment_method VARCHAR(50) DEFAULT NULL,
+  cf_payment_id VARCHAR(100) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);

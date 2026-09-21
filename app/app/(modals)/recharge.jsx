@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import api from '../../services/api';
+import { createPaymentOrder, getPaymentOrderStatus } from '../../services/payment';
 import { COLORS, SPACING, RADIUS } from '../../utils/constants';
+
+const CF_CHECKOUT_BASE = 'https://api.cashfree.com/pg/orders/pay';
 
 const rechargeOptions = [
   { amount: 50, bonus: 5, label: '₹50' },
@@ -19,9 +23,16 @@ export default function RechargeScreen() {
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+  const pollingRef = useRef(null);
   const router = useRouter();
 
-  useEffect(() => { fetchBalance(); }, []);
+  useEffect(() => {
+    fetchBalance();
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
 
   const fetchBalance = async () => {
     try {
@@ -34,19 +45,67 @@ export default function RechargeScreen() {
     }
   };
 
+  const pollOrderStatus = (orderId) => {
+    pollingRef.current = setInterval(async () => {
+      try {
+        const statusData = await getPaymentOrderStatus(orderId);
+        if (statusData.payment_status === 'PAID') {
+          clearInterval(pollingRef.current);
+          pollingRef.current = null;
+          setPaymentStatus('PAID');
+          setLoading(false);
+          fetchBalance();
+          Alert.alert('Payment Successful', `₹${selectedAmount} has been added to your wallet!`, [
+            { text: 'OK', onPress: () => router.back() },
+          ]);
+        } else if (statusData.payment_status === 'FAILED' || statusData.payment_status === 'EXPIRED') {
+          clearInterval(pollingRef.current);
+          pollingRef.current = null;
+          setPaymentStatus('FAILED');
+          setLoading(false);
+          Alert.alert('Payment Failed', 'Your payment was not completed. Please try again.');
+        }
+      } catch (error) {
+        console.log('Poll status error:', error.message);
+      }
+    }, 3000);
+
+    setTimeout(() => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        setLoading(false);
+        Alert.alert('Timeout', 'Could not verify payment status. Please check your wallet balance.');
+      }
+    }, 120000);
+  };
+
   const handleRecharge = async () => {
     if (!selectedAmount) return Alert.alert('Error', 'Please select a recharge amount');
     setLoading(true);
+    setPaymentStatus(null);
+
     try {
-      const res = await api.post('/user/wallet/recharge', { amount: selectedAmount });
-      setBalance(res.data.data?.balance || balance + selectedAmount);
-      Alert.alert('Success', `₹${selectedAmount} added to your wallet!`, [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
+      const orderData = await createPaymentOrder(selectedAmount);
+      const { payment_session_id, order_id } = orderData;
+
+      if (!payment_session_id) {
+        setLoading(false);
+        return Alert.alert('Error', 'Failed to create payment session. Please try again.');
+      }
+
+      const checkoutUrl = `${CF_CHECKOUT_BASE}/${payment_session_id}`;
+      const result = await WebBrowser.openBrowserAsync(checkoutUrl);
+
+      if (result.type === 'cancel' || result.type === 'dismiss') {
+        pollOrderStatus(order_id);
+      } else {
+        pollOrderStatus(order_id);
+      }
     } catch (error) {
-      Alert.alert('Error', 'Failed to recharge. Please try again.');
-    } finally {
       setLoading(false);
+      const message = error.response?.data?.message || 'Failed to start payment. Please try again.';
+      Alert.alert('Error', message);
     }
   };
 
@@ -54,7 +113,7 @@ export default function RechargeScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+          <Text style={{ fontSize: 28, fontWeight: '700', color: COLORS.textPrimary, lineHeight: 44 }}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Recharge Wallet</Text>
         <View style={{ width: 36 }} />
@@ -68,6 +127,13 @@ export default function RechargeScreen() {
           <Text style={styles.balanceAmount}>₹{balance}.00</Text>
         )}
       </LinearGradient>
+
+      {loading && paymentStatus !== 'PAID' && (
+        <View style={styles.processingBanner}>
+          <ActivityIndicator size="small" color={COLORS.primary} />
+          <Text style={styles.processingText}>Processing your payment...</Text>
+        </View>
+      )}
 
       <View style={styles.offerBanner}>
         <Ionicons name="flash" size={20} color={COLORS.warning} />
@@ -98,8 +164,8 @@ export default function RechargeScreen() {
         ))}
       </View>
 
-      <TouchableOpacity onPress={handleRecharge} activeOpacity={0.8} disabled={loading}>
-        <LinearGradient colors={COLORS.gradient.call} style={[styles.payButton, loading && { opacity: 0.6 }]}>
+      <TouchableOpacity onPress={handleRecharge} activeOpacity={0.8} disabled={loading || paymentStatus === 'PAID'}>
+        <LinearGradient colors={COLORS.gradient.call} style={[styles.payButton, (loading || paymentStatus === 'PAID') && { opacity: 0.6 }]}>
           {loading ? (
             <ActivityIndicator size="small" color={COLORS.white} />
           ) : (
@@ -115,7 +181,7 @@ export default function RechargeScreen() {
         {[
           { icon: 'call', text: 'Make voice calls with experts' },
           { icon: 'chatbubble', text: 'Chat with verified users' },
-          { icon: 'shield-checkmark', text: '100% secure payments' },
+          { icon: 'shield-checkmark', text: '100% secure payments via Cashfree' },
           { icon: 'gift', text: 'Get bonus on every recharge' },
         ].map((benefit, i) => (
           <View key={i} style={styles.benefitItem}>
@@ -135,7 +201,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingTop: 50, paddingHorizontal: SPACING.lg, paddingBottom: SPACING.lg,
   },
-  backButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
+  backButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
   title: { fontSize: 18, fontWeight: '700', color: COLORS.textPrimary },
   balanceCard: {
     marginHorizontal: SPACING.lg, borderRadius: RADIUS.xl,
@@ -143,6 +209,12 @@ const styles = StyleSheet.create({
   },
   balanceLabel: { fontSize: 14, color: COLORS.textSecondary },
   balanceAmount: { fontSize: 32, fontWeight: '800', color: COLORS.textPrimary, marginTop: 4 },
+  processingBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    marginHorizontal: SPACING.lg, marginTop: SPACING.md,
+    backgroundColor: COLORS.primary + '15', padding: SPACING.md, borderRadius: RADIUS.lg,
+  },
+  processingText: { fontSize: 13, fontWeight: '600', color: COLORS.primary },
   offerBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     marginHorizontal: SPACING.lg, marginTop: SPACING.md, marginBottom: SPACING.lg,

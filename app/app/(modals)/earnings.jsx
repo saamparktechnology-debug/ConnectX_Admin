@@ -63,8 +63,8 @@ export default function EarningsScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.replace('/(tabs)')}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
+        <TouchableOpacity onPress={() => router.replace('/(tabs)')} style={styles.backButton}>
+          <Text style={{ fontSize: 28, fontWeight: '700', color: COLORS.textPrimary, lineHeight: 44 }}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>My Earnings</Text>
         <View style={{ width: 24 }} />
@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
     paddingTop: 50, paddingHorizontal: SPACING.lg, paddingBottom: SPACING.lg,
   },
   title: { fontSize: 22, fontWeight: '800', color: COLORS.textPrimary },
+  backButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
   statsCard: {
     flexDirection: 'row', marginHorizontal: SPACING.lg, borderRadius: RADIUS.xl,
     padding: SPACING.lg, justifyContent: 'space-between', alignItems: 'center',
