@@ -1,7 +1,6 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const API_URL = 'https://connecto-server-jzev.onrender.com/api';
+import { API_URL } from '../utils/constants';
 
 const api = axios.create({
   baseURL: API_URL,

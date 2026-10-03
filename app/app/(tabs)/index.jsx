@@ -242,7 +242,7 @@ export default function HomeScreen() {
       ]);
       return;
     }
-    router.push(`/(modals)/call?expertId=${expert.id}&name=${expert.name}&photo=${expert.primary_photo || ''}&price=${callRate}`);
+    router.push(`/(modals)/call?expertId=${expert.id}&name=${expert.name}&photo=${expert.primary_photo || ''}&price=${callRate}&callType=audio`);
   };
 
   const handleSearch = (text) => {

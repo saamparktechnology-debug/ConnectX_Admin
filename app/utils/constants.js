@@ -61,4 +61,5 @@ export const RADIUS = {
   full: 999,
 };
 
-export const API_URL = 'https://connecto-server-jzev.onrender.com/api';
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.31.130:5000/api';
+export const SOCKET_URL = process.env.EXPO_PUBLIC_SOCKET_URL || 'http://192.168.31.130:5000';

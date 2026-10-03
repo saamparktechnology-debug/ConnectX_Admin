@@ -9,18 +9,20 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { io } from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio } from 'expo-av';
+import { createAgoraRtcEngine, ClientRoleType, ChannelProfileType } from 'react-native-agora';
 import api from '../../services/api';
 import useAuthStore from '../../store/useAuthStore';
-import { COLORS, SPACING, RADIUS } from '../../utils/constants';
+import { COLORS, SPACING, RADIUS, SOCKET_URL } from '../../utils/constants';
 
 const { width } = Dimensions.get('window');
-const SOCKET_URL = 'https://connecto-server-jzev.onrender.com';
 const RATE_PER_MIN = 1.5;
 const RING_COUNTDOWN = 10;
 
 const AnimatedDot = ({ delay }) => {
   const opacity = useRef(new Animated.Value(0.3)).current;
 
+  
+  
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
@@ -55,11 +57,62 @@ export default function CallScreen() {
   const [availableFemales, setAvailableFemales] = useState([]);
   const [ringingFemale, setRingingFemale] = useState(null);
   const [ringCountdown, setRingCountdown] = useState(RING_COUNTDOWN);
+// --- connected state ---
 
-  // --- connected state ---
-  const [duration, setDuration] = useState(0);
-  const [cost, setCost] = useState(0);
-  const [callId, setCallId] = useState(null);
+const [duration, setDuration] = useState(0);
+
+const [cost, setCost] = useState(0);
+
+const [callId, setCallId] = useState(null);
+
+const [remoteUid, setRemoteUid] = useState(null);
+
+const engineRef = useRef(null);
+
+const initAgora = () => {
+  try {
+    engineRef.current = createAgoraRtcEngine();
+
+    engineRef.current.initialize({
+      appId: process.env.EXPO_PUBLIC_AGORA_APP_ID || 'dummy_app_id',
+    });
+      
+      engineRef.current.registerEventHandler({
+        onJoinChannelSuccess: (connection, elapsed) => {
+          console.log('Agora joined successfully');
+        },
+        onUserJoined: (connection, remoteUid, elapsed) => {
+          console.log('Remote user joined', remoteUid);
+          setRemoteUid(remoteUid);
+        },
+        onUserOffline: (connection, remoteUid, reason) => {
+          console.log('Remote user offline', remoteUid);
+          setRemoteUid(null);
+        }
+      });
+      engineRef.current.setChannelProfile(ChannelProfileType.ChannelProfileCommunication);
+      engineRef.current.setClientRole(ClientRoleType.ClientRoleBroadcaster);
+      engineRef.current.enableAudio();
+    } catch(e) { console.log('Agora init error', e); }
+  };
+
+  const joinAgoraChannel = (token, channelName, uid) => {
+    if (!engineRef.current) initAgora();
+    
+    engineRef.current.joinChannel(token, channelName, uid, {
+      clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+    });
+  };
+
+  const destroyAgora = () => {
+    if (engineRef.current) {
+      engineRef.current.leaveChannel();
+      engineRef.current.removeAllListeners();
+      engineRef.current.release();
+      engineRef.current = null;
+    }
+  };
+
 
   // --- audio controls ---
   const [isMuted, setIsMuted] = useState(false);
@@ -152,6 +205,7 @@ export default function CallScreen() {
         setCallId(data.callId || data.callQueueId);
         setCallStatus('connected');
         startCallTimer();
+        joinAgoraChannel(data.rtcToken, data.channelName, data.uid);
       });
 
       socket.on('call_trying_next', (data) => {
@@ -180,6 +234,7 @@ export default function CallScreen() {
         clearAllTimers();
         setDuration(data.duration || 0);
         setCost(data.cost || 0);
+        destroyAgora();
         setCallStatus('ended');
         setTimeout(() => router.replace('/(tabs)'), 2000);
       });
@@ -216,6 +271,7 @@ export default function CallScreen() {
       mounted = false;
       clearAllTimers();
       stopRingSound();
+      destroyAgora();
       socketRef.current?.disconnect();
     };
   }, []);
@@ -370,6 +426,7 @@ export default function CallScreen() {
       cost: parseFloat(cost.toFixed(2)),
     });
     setCallStatus('ended');
+    destroyAgora();
     setTimeout(() => router.replace('/(tabs)'), 1500);
   };
 
@@ -612,7 +669,10 @@ export default function CallScreen() {
         <View style={styles.controls}>
           <TouchableOpacity
             style={[styles.controlButton, isMuted && styles.controlButtonActive]}
-            onPress={() => setIsMuted(!isMuted)}
+            onPress={() => {
+              setIsMuted(!isMuted);
+              if (engineRef.current) engineRef.current.muteLocalAudioStream(!isMuted);
+            }}
           >
             <Ionicons name={isMuted ? 'mic-off' : 'mic'} size={24} color={COLORS.white} />
             <Text style={styles.controlText}>{isMuted ? 'Unmute' : 'Mute'}</Text>
